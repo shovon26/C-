@@ -1,0 +1,130 @@
+body{
+    height: 700px;
+    width: 1500px;
+}
+
+.parent {
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    background-color: white;
+}
+
+.navbar {
+    display: flex;
+    position: sticky; 
+    align-items: center;
+    justify-content: center;
+    top: 0px;
+    cursor: pointer;
+}
+
+.nav-list {
+    width: 50%;
+    display: flex;
+}
+
+.nav-list li {
+    list-style: none;
+    padding: 26px 30px;
+}
+
+.nav-list li a {
+    text-decoration: none;
+    color: white;
+}
+
+.nav-list li a:hover {
+    color: black;
+}
+
+.rightNav {
+    float: right;
+}
+
+.background {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+
+.form{
+    float: left;
+    height: 100%;
+    width: 50%;
+    background-color: white;
+}
+
+.form_headings {
+    margin-top: 100px;
+    margin-right: 250px;
+}
+
+.ucsf-form {
+    margin-left: 0px;
+}
+
+  .form-row input[type='text'],
+  .form-row input[type='password'] {
+    width: 400px;
+    height: initial;
+    background-color: #FFFFFF;
+    border: 2px solid #D6D9DC;
+    border-radius: 3px;
+    padding: 7px;
+    font-size : 14px;
+  }
+
+  .for_checkbox{
+    margin-left: 170px;
+    float: left;
+  }
+
+  .form-row button {
+    width: 400px;
+
+    font-size: 20px;
+    font-weight: bold;
+  
+    color: #FFFFFF;
+    background-color: #5995DA;
+  
+    border: none;
+    border-radius: 3px;
+  
+    padding: 10px 40px;
+    cursor: pointer;
+  }
+  
+  .form-row button:hover {
+    background-color: #76AEED;
+  }
+  
+  .form-row button:active {
+    background-color: #407FC7;
+  }
+
+.details{
+    float: left;
+    height: 100%;
+    width: 50%;
+    background-color: lightgray;
+}
+.details_info{
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-bottom: 30px;
+}
+
+.details_info1 {
+    display: inline;
+    margin-top: 20px;
+    color: lightslategrey;
+}
+
+.navbar{
+    float: left;
+    width: 100%;
+    height: 50px;
+    background-color: #0d0d0e;
+    color: white;
+}
