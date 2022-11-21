@@ -1,0 +1,171 @@
+body{
+    height: 800px;
+    width: 1500px;
+}
+
+.parent {
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    background-color: white;
+}
+
+.topSection {
+    float: left;
+    width: 100%;
+    height: 7%;
+    background-color: aquamarine;
+}
+
+.topLeftBar{
+    text-align: left;
+    float: left;
+}
+a:link, a:visited {
+    background-color: red;
+    color: black;
+    padding: 18px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  a:hover, a:active {
+    background-color: red;
+  }
+
+  .leftSideBar a:link, a:visited {
+    background-color: gray;
+    color: black;
+    padding: 10px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .leftSideBar a:hover, a:active {
+    background-color: gray;
+  }
+  span {
+    content: "\2103";
+  }
+
+.topMidleBar input[type='text'] {
+    float: left;
+    margin-left: 400px;
+    margin-top: 10px;
+    background-color: #FFFFFF;
+    border: 2px solid #D6D9DC;
+    border-radius: 3px;
+    padding: 7px;
+    font-size : 14px;
+}
+
+.topMidleBar button[type='submit'] {
+    float: left;
+    margin-left: 0px;
+    margin-top: 10px;
+    background-color: #FFFFFF;
+    border: 2px solid #D6D9DC;
+    border-radius: 3px;
+    padding: 7px;
+    font-size : 14px;
+    cursor: pointer;
+}
+
+.topRightBar{
+    float: right;
+}
+
+
+.bottomSection{
+    float: left;
+    height: 93%;
+    width: 100%;
+}
+
+.leftSideBar{
+    text-align: left;
+    float: left;
+    height: 100%;
+    width: 15%;
+    background-color: whitesmoke;
+}
+
+.rightSideContent{
+    float: left;
+    height: 100%;
+    width: 85%;
+    background-color: blanchedalmond;
+}
+
+.secondNavBar{
+    float: left;
+    height: 10%;
+    width: 100%;
+    background-color: whitesmoke;
+}
+.secondNavBar a:link, a:visited {
+    background-color: gray;
+    color: black; 
+    padding: 28px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .secondNavBar a:hover, a:active {
+    background-color: gray;
+  }
+
+.floatleft{
+    float: left;
+}
+.bg-red{
+    background-color: red;
+}
+.bg-green{
+    background-color: green;
+}
+.bg-blue{
+    background-color: blue;
+}
+.bg-yellow{
+    background-color: yellow;
+}
+
+.content1{
+    padding: 5px;
+    width: 100%;
+    height: 30%;
+    float: left;
+    background-color: white;
+}
+
+.box{
+    width: 25%;
+    height: 100%;
+}
+
+.content1Details{
+    width: 100%;
+    height: 15%;
+    float: left;
+    background-color: white;
+}
+
+.boxDetails {
+    width: 25%;
+    height: 100%;
+}
+
+.content2{
+    width: 100%;
+    height: 30%;
+    float: left;
+    background-color: white;
+}
+.content2Details{
+    width: 100%;
+    height: 15%;
+    float: left;
+    background-color: white;
+}
