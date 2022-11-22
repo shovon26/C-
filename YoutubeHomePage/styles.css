@@ -21,8 +21,8 @@ body{
     text-align: left;
     float: left;
 }
-a:link, a:visited {
-    background-color: red;
+a:link {
+    background-color: white;
     color: black;
     padding: 18px 25px;
     text-align: center;
@@ -31,10 +31,10 @@ a:link, a:visited {
   }
   
   a:hover, a:active {
-    background-color: red;
+    background-color: white;
   }
 
-  .leftSideBar a:link, a:visited {
+  .leftSideBar a:link {
     background-color: gray;
     color: black;
     padding: 10px 25px;
@@ -92,10 +92,11 @@ a:link, a:visited {
 }
 
 .rightSideContent{
+    margin-top: 20px;
     float: left;
     height: 100%;
     width: 85%;
-    background-color: blanchedalmond;
+    background-color: white;
 }
 
 .secondNavBar{
@@ -104,7 +105,8 @@ a:link, a:visited {
     width: 100%;
     background-color: whitesmoke;
 }
-.secondNavBar a:link, a:visited {
+
+.secondNavBar a:link {
     background-color: gray;
     color: black; 
     padding: 28px 20px;
@@ -112,7 +114,7 @@ a:link, a:visited {
     text-decoration: none;
     display: inline-block;
   }
-  .secondNavBar a:hover, a:active {
+  .secondNavBar a:hover {
     background-color: gray;
   }
 
@@ -132,8 +134,9 @@ a:link, a:visited {
     background-color: yellow;
 }
 
-.content1{
-    padding: 5px;
+.content{
+    margin-top: 10px;
+    margin-left: 12px;
     width: 100%;
     height: 30%;
     float: left;
@@ -141,11 +144,18 @@ a:link, a:visited {
 }
 
 .box{
-    width: 25%;
+    margin-right: 12px;
+    width: 24%;
     height: 100%;
+    padding: 0px;
 }
 
-.content1Details{
+.box a{
+    width: 100%;
+    padding: 0px;
+}
+
+.contentDetails{
     width: 100%;
     height: 15%;
     float: left;
@@ -153,19 +163,11 @@ a:link, a:visited {
 }
 
 .boxDetails {
-    width: 25%;
+    margin-right: 12px;
+    width: 24%;
     height: 100%;
 }
 
-.content2{
-    width: 100%;
-    height: 30%;
-    float: left;
-    background-color: white;
-}
-.content2Details{
-    width: 100%;
-    height: 15%;
-    float: left;
-    background-color: white;
+.boxDetails a{
+    color: black;
 }
