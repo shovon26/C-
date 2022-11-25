@@ -1,0 +1,108 @@
+.body{
+    height: 800px;
+    width: 100%;
+}
+.container-fluid{
+    height: 100%;
+    width: 100%;
+}
+.bg-red{
+    background-color: red;
+}
+.bg-blue{
+    background-color: blue;
+}
+.bg-green{
+    background-color: green;
+}
+.bg-black{
+    background-color: black;
+}
+.bg-white{
+    background-color: white;
+}
+.bg-aqua{
+    background-color: aqua;
+}
+.bg-purple{
+    background-color: purple;
+}
+.bg-mixed{
+    background-color: bisque;
+}
+.floatLeft{
+    float: left;
+}
+.marginLeft{
+    margin-left: 0%;
+}
+.col-6{
+    height: 100%;
+}
+.boxFull{
+    height: 100%;
+    width: 100%;
+}
+.box1{
+    height: 20%;
+    width: 98%;
+    margin-top: 2%;
+    margin-left: 2%;
+}
+.box2{
+    float: left;
+    height: 20%;
+    width: 47%;
+    margin-top: 2%;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+.box3{
+    float: left;
+    height: 20%;
+    width: 47%;
+    margin-top: 2%;
+    margin-left: 2%;
+    margin-bottom: 2%;
+}
+
+.box4{
+    height: 50%;
+    width: 98%;
+    margin-top: 20px;
+    margin-left: 2%;
+    
+}
+.boxBottom{
+    height: 33.3%;
+    width: 34.7%;
+}
+
+.boxRight1{
+    height: 42%;
+    width: 100%;
+    margin-top: 15px;
+    margin-left: 0%;
+}
+
+.col-3{
+    width: 100%;
+    float: left;
+    margin-right: 8%;
+}
+
+.boxRight2{
+    height: 50%;
+    width: 100%;
+    margin-top: 15px;
+    margin-left: 0%;
+}
+.boxRight21{
+    height: 30%;
+    background-color: brown;
+}
+
+.boxRight22{
+    height: 70%;
+    background-color: rgb(25, 131, 71);
+}
