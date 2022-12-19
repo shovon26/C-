@@ -137,7 +137,27 @@ namespace WebClient_ConsoleApp
                     ret += result[i];
                 }
             }
-            return ret;
+
+            // Remove extra space
+            int idx = 0;
+            int N = ret.Length;
+            string answer = "";
+            while (ret[idx] == ' ') idx++;
+            while(idx < N)
+            {
+                if (idx < N && ret[idx] == ' ')
+                {
+                    answer += ret[idx];
+                    idx++;
+                    while (idx < N && ret[idx] == ' ') idx++;
+                }
+                else
+                {
+                    if(idx < N) answer += ret[idx];
+                    idx++;
+                }
+            }
+            return answer;
         }
 
         private static int convertPrice(string price)
@@ -403,7 +423,6 @@ namespace WebClient_ConsoleApp
             }
 
             List<Class> classList = new List<Class>();
-            Console.WriteLine("\nClass List and Their Price :\n");
             foreach (Class item in classes)
             {
                 string con1 = item.ClassName;
@@ -416,19 +435,19 @@ namespace WebClient_ConsoleApp
             }
             return classList;
         }
-        public  List<Class> findClassListByHeading(string address, Tuple<char, char, char, char, char, char> tag)
+
+        public List<Class> findClassListByHeading(string address, Tuple<char, char, char, char, char, char> tag)
         {
             WebClient client = new WebClient();
-            //client.Headers["accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
             client.Headers["user-agent"] = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Mobile Safari/537.36";
             string reply = client.DownloadString(address);
             int len = reply.Length;
             //Console.WriteLine("Total Length : " + len);
             //Console.WriteLine("html full : " + reply);
             List<Class> classes = new List<Class>();
-            for (int i = 0; i+2 < len;)
+            for (int i = 0; i + 2 < len;)
             {
-                if (i+2 < len && reply[i] == tag.Item1 && reply[i + 1] == tag.Item2 && reply[i + 2] == tag.Item3)
+                if (i + 2 < len && reply[i] == tag.Item1 && reply[i + 1] == tag.Item2 && reply[i + 2] == tag.Item3)
                 {
                     string temp = "";
                     int idx = i + 3;
@@ -437,7 +456,7 @@ namespace WebClient_ConsoleApp
                     temp += reply[i + 2];
                     while (idx + 2 < len)
                     {
-                        if (reply[idx] == tag.Item4 && reply[idx + 1] == tag.Item5 && reply[idx + 2] == tag.Item6)
+                        if (idx+2 < len && reply[idx] == tag.Item4 && reply[idx + 1] == tag.Item5 && reply[idx + 2] == tag.Item6)
                         {
                             temp += reply[idx];
                             temp += reply[idx + 1];
@@ -461,7 +480,8 @@ namespace WebClient_ConsoleApp
 
 
                     // Finding class Price
-                    try {
+                    try
+                    {
                         int next_idx = idx;
                         bool have = false;
                         //string price = "";
@@ -490,9 +510,9 @@ namespace WebClient_ConsoleApp
                                     price_index++;
                                 }
                                 //Console.WriteLine("Current Price : " + current_price);
-                                
+
                                 int P = GenericClassContent.convertPrice(current_price);
-                                if(P >= 10 && P <= 500)
+                                if (P >= 10 && P <= 500)
                                 {
                                     classPrice = current_price;
                                     break;
@@ -538,7 +558,7 @@ namespace WebClient_ConsoleApp
                         }
                         if (have == false) classPrice = "$0";
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Console.WriteLine("Error1 : " + ex.Message);
                     }
@@ -566,7 +586,7 @@ namespace WebClient_ConsoleApp
                         bool ok1 = false;
                         while (nextClassIndex < len)
                         {
-                            if (nextClassIndex+3 < len && reply[nextClassIndex] == tag.Item1 && reply[nextClassIndex + 1] == tag.Item2 && reply[nextClassIndex + 2] == tag.Item3)
+                            if (nextClassIndex + 3 < len && reply[nextClassIndex] == tag.Item1 && reply[nextClassIndex + 1] == tag.Item2 && reply[nextClassIndex + 2] == tag.Item3)
                             {
                                 ok1 = true;
                                 break;
@@ -579,9 +599,9 @@ namespace WebClient_ConsoleApp
                             add += reply[from];
                             add += reply[from + 1];
                             add += reply[from + 2];
-                            for(int rep=from+3; rep<len; rep++)
+                            for (int rep = from + 3; rep < len; rep++)
                             {
-                                if(rep+2 < len && reply[rep] == '/' && reply[rep+1] == 'p' && reply[rep+2] == '>')
+                                if (rep + 2 < len && reply[rep] == '/' && reply[rep + 1] == 'p' && reply[rep + 2] == '>')
                                 {
                                     add += reply[rep];
                                     add += reply[rep + 1];
@@ -594,7 +614,7 @@ namespace WebClient_ConsoleApp
                             classes.Add(tempClass);
                             break;
                         }
-                        
+
                         int to = -1;
                         while (nextClassIndex > from)
                         {
@@ -612,7 +632,7 @@ namespace WebClient_ConsoleApp
 
                         i = to;
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Console.WriteLine("Error2 : " + ex.Message);
                         break;
@@ -621,7 +641,7 @@ namespace WebClient_ConsoleApp
                 else i++;
             }
 
-            List<Class> classList = new List < Class >();
+            List<Class> classList = new List<Class>();
 
             foreach (Class item in classes)
             {
@@ -631,6 +651,205 @@ namespace WebClient_ConsoleApp
                 string classDescription = GenericClassContent.removeDescriptionTag(con2);
                 string classPrice = item.ClassPrice;
                 Class currentClass = new Class(className, classDescription, classPrice);
+                classList.Add(currentClass);
+            }
+            return classList;
+        }
+
+        public static void findHTML(string address)
+        {
+            WebClient client = new WebClient();
+            //client.Headers["accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
+            client.Headers["user-agent"] = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Mobile Safari/537.36";
+            string reply = client.DownloadString(address);
+            Console.WriteLine(reply);
+        }
+
+        public List<Class> findClassListByParagraph(string address, Tuple<char, char, char, char, char, char> tag, int fontSize = 32, string match = "font-size:")
+        {
+            WebClient client = new WebClient();
+            //client.Headers["accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
+            client.Headers["user-agent"] = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Mobile Safari/537.36";
+            string reply = client.DownloadString(address);
+
+            int len = reply.Length;
+            List<Class> classes = new List<Class>();
+            for(int i=0; i + 2 < len;)
+            {
+                if (i + 2 < len && reply[i] == tag.Item1 && reply[i + 1] == tag.Item2 && reply[i + 2] == tag.Item3) // find possible class 
+                {
+                    int idx = i + 3;
+                    //Console.WriteLine("Test 1 : " + reply.Substring(idx, 10));
+                    bool possibleClass = false;
+                    while (idx < len)
+                    {
+                        if (idx + 3 < len && reply[idx] == '<' && reply[idx + 1] == tag.Item4 && reply[idx + 2] == tag.Item5 && reply[idx + 3] == tag.Item6) break;
+                        if (reply.Substring(idx, 10) == match)
+                        {
+                            int from = idx + 11;
+                            while (true)
+                            {
+                                if (Char.IsDigit(reply, from) == true) break;
+                                from++;
+                            }
+                            string num = "";
+                            while (from < len)
+                            {
+                                if (Char.IsDigit(reply, from) == false) break;
+                                num += reply[from];
+                                from++;
+                            }
+                            int size = Int32.Parse(num);
+                            if(size == fontSize) possibleClass = true;
+                            break;
+                        }
+                        idx++;
+                    }
+                    if (possibleClass == true)
+                    {
+                        string temp = "";
+                        temp += reply.Substring(i, 3);
+                        idx = i + 3;
+                        while (idx < len)
+                        {
+                            if (idx+3 < len && reply[idx] == '<' && reply[idx + 1] == tag.Item4 && reply[idx + 2] == tag.Item5 && reply[idx + 3] == tag.Item6)
+                            {
+                                temp += reply.Substring(idx, 4);
+                                break;
+                            }
+                            else temp += reply[idx];
+                            idx++;
+                        }
+
+                        // find class price
+                        string classPrice = "";
+                        try
+                        {
+                            int next_idx = idx+6;
+                            bool have = false;
+                            //string price = "";
+                            while (next_idx < len)
+                            {
+                                if (next_idx+2 < len && reply[next_idx] == tag.Item1 && reply[next_idx + 1] == tag.Item2 && reply[next_idx + 2] == tag.Item3)
+                                {
+                                    break;
+                                }
+                                if (reply[next_idx] == '$')
+                                {
+                                    //Console.WriteLine("Block 1");
+                                    int from = next_idx + 1;
+                                    have = true;
+                                    while (true)
+                                    {
+                                        if (Char.IsDigit(reply, from) == true) break;
+                                        from++;
+                                    }
+                                    string current_price = "$";
+                                    int price_index = from;
+                                    while (true)
+                                    {
+                                        if (Char.IsDigit(reply, price_index) == false && reply[price_index] != '.') break;
+                                        current_price += reply[price_index];
+                                        price_index++;
+                                    }
+
+                                    int P = GenericClassContent.convertPrice(current_price);
+                                    if (P >= 10 && P <= 500)
+                                    {
+                                        classPrice = current_price;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        classPrice = "$0";
+                                    }
+                                    next_idx++;
+                                }
+                                else if (next_idx + 3 < len && reply[next_idx] == '&' && reply[next_idx + 1] == '#' && reply[next_idx + 2] == '3' && reply[next_idx + 3] == '6')
+                                {
+                                    //Console.WriteLine("Block 2");
+                                    int from = next_idx + 4;
+                                    while (true)
+                                    {
+                                        if (Char.IsDigit(reply, from) == true) break;
+                                        have = true;
+                                        from++;
+                                    }
+                                    string current_price = "$";
+                                    int price_index = from;
+                                    while (true)
+                                    {
+                                        if (Char.IsDigit(reply, price_index) == false && reply[price_index] != '.') break;
+                                        current_price += reply[price_index];
+                                        price_index++;
+                                    }
+
+                                    int P = GenericClassContent.convertPrice(current_price);
+                                    if (P >= 10 && P <= 500)
+                                    {
+                                        classPrice = current_price;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        classPrice = "$0";
+                                    }
+                                    next_idx++;
+                                }
+                                else next_idx++;
+                            }
+                            if (have == false) classPrice = "$0";
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Error1 : " + ex.Message);
+                        }
+
+                        // Finding class Description
+                        try
+                        {
+                            //find starting paragraph
+                            int next_idx = idx+4;
+
+                            int from = next_idx;
+
+                            string description = "";
+
+                            //Console.WriteLine("Test : " + reply.Substring(from, 20));
+
+                            while(from < len)
+                            {
+                                if (from+3 < len && reply[from] == '<' && reply[from + 1] == tag.Item4 && reply[from + 2] == tag.Item5 && reply[from + 3] == tag.Item6) break;
+                                description+= reply[from];
+                                from++;
+                            }
+                           // Console.WriteLine("Class Price : " + classPrice + "\n\n");
+                            
+                            Class currentClass = new Class(temp, description, classPrice);
+                            classes.Add(currentClass);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Error2 : " + ex.Message);
+                            break;
+                        }
+                    }
+                    i++;
+                }
+                else i++;
+            }
+
+            List<Class> classList = new List<Class>();
+
+            foreach (Class item in classes)
+            {
+                string con1 = item.ClassName;
+                string con2 = item.ClassDescription;
+                string className = GenericClassContent.findContent(con1);
+                string classDescription = GenericClassContent.removeDescriptionTag(con2);
+                string classPrice = item.ClassPrice;
+                Class currentClass = new Class(className, classDescription, classPrice);
+                //Console.WriteLine(currentClass.ClassName + "\n" + currentClass.ClassDescription+ "\n" + currentClass.ClassPrice);
                 classList.Add(currentClass);
             }
             return classList;
@@ -814,31 +1033,28 @@ namespace WebClient_ConsoleApp
     {
         GenericClassContent genericClassContent = new GenericClassContent();
 
-        public void updateClassTableForHeading(Medical medical, Tuple<char, char, char, char, char, char> Tag)
+        //Execute All of common query for different html tag which is helping us to extract class information
+        private static void executeDatabaseQuery(Medical medical, List<Class> classListCurrent, List<Class> classListDB)
         {
             string connectionString = "Data Source=DESKTOP-U2K0EKM;Initial Catalog=SearchContentDB;Integrated Security=True";
             SqlConnection connection = new SqlConnection(connectionString);
             connection.Open();
             SqlCommand command = new SqlCommand();
-
-            List<Class> classListCurrent = genericClassContent.findClassListByHeading(medical.MedicalUrl, Tag);
-            List<Class> classListDB = DBHelper.existingClassFromDB(medical.MedicalID);
             List<Medical> medicalListDB = DBHelper.StaticMedicalTableList();
-
             //Case 1 : Current Medical is completely new to database
 
             bool have = false;
-            foreach(Medical item in medicalListDB)
+            foreach (Medical item in medicalListDB)
             {
-               // Console.WriteLine(medical.MedicalID + " : " + item.MedicalID);
-                if(medical.MedicalID == item.MedicalID)
+                // Console.WriteLine(medical.MedicalID + " : " + item.MedicalID);
+                if (medical.MedicalID == item.MedicalID)
                 {
                     have = true;
                     break;
                 }
             }
             //Console.WriteLine("Have value here : " + have);
-            if(have == false)
+            if (have == false)
             {
                 foreach (Class item in classListCurrent)
                 {
@@ -848,7 +1064,7 @@ namespace WebClient_ConsoleApp
 
                     try
                     {
-                        string Query2 = "insert into Class(ClassName, ClassDescription, ClassPrice, MedicalID, ClassStatus) values('" + className + "', '" + classDescription + "', '" + classPrice + "', '" + medical.MedicalID + "', '"+true+"');";
+                        string Query2 = "insert into Class(ClassName, ClassDescription, ClassPrice, MedicalID, ClassStatus) values('" + className + "', '" + classDescription + "', '" + classPrice + "', '" + medical.MedicalID + "', '" + true + "');";
                         command = new SqlCommand(Query2, connection);
                         command.ExecuteNonQuery();
                     }
@@ -866,9 +1082,9 @@ namespace WebClient_ConsoleApp
             {
                 bool present = false;
                 int id = -1;
-                foreach(Class itemDB in classListDB)
+                foreach (Class itemDB in classListDB)
                 {
-                    if(itemDB.ClassName == itemCurrent.ClassName)
+                    if (itemDB.ClassName == itemCurrent.ClassName)
                     {
                         id = itemDB.ClassID;
                         present = true;
@@ -876,16 +1092,16 @@ namespace WebClient_ConsoleApp
                     }
                 }
                 //Console.WriteLine("Present 1  here : " + present);
-                if(present == true)
+                if (present == true)
                 {
                     try
                     {
-                        String Query = "UPDATE Class set ClassName = '" + itemCurrent.ClassName + "', ClassDescription = '" + itemCurrent.ClassDescription + "', ClassPrice = '" + itemCurrent.ClassPrice + "', DateAndTime = CURRENT_TIMESTAMP, ClassStatus = '"+true+"' where ID = '" + id + "';";
+                        String Query = "UPDATE Class set ClassName = '" + itemCurrent.ClassName + "', ClassDescription = '" + itemCurrent.ClassDescription + "', ClassPrice = '" + itemCurrent.ClassPrice + "', DateAndTime = CURRENT_TIMESTAMP, ClassStatus = '" + true + "' where ID = '" + id + "';";
                         //Console.WriteLine("Medical ID : " + medical.MedicalID + "\n\n Query : " + Query);
                         command = new SqlCommand(Query, connection);
                         command.ExecuteNonQuery();
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Console.WriteLine("Error Message : " + ex.Message);
                     }
@@ -933,128 +1149,29 @@ namespace WebClient_ConsoleApp
                     }
                 }
             }
+            connection.Close();
+        }
 
+        public void updateClassTableForHeading(Medical medical, Tuple<char, char, char, char, char, char> Tag)
+        {
+            List<Class> classListCurrent = genericClassContent.findClassListByHeading(medical.MedicalUrl, Tag);
+            List<Class> classListDB = DBHelper.existingClassFromDB(medical.MedicalID); 
+            DBHelper.executeDatabaseQuery(medical, classListCurrent, classListDB); //Will execute all of the required query for this current heading tag
+        }
+
+        public void updateClassTableForParagraph(Medical medical, Tuple<char, char, char, char, char, char> Tag)
+        {
+            //Always you have to provide the fontSize in findClassListByParagraph(medical.MedicalUrl, Tag)
+            List<Class> classListCurrent = genericClassContent.findClassListByParagraph(medical.MedicalUrl, Tag); 
+            List<Class> classListDB = DBHelper.existingClassFromDB(medical.MedicalID);
+            DBHelper.executeDatabaseQuery(medical, classListCurrent, classListDB); //Will execute all of the required query for this current paragraph tag
         }
 
         public void updateClassTableForBig(Medical medical, string Tag)
         {
-            string connectionString = "Data Source=DESKTOP-U2K0EKM;Initial Catalog=SearchContentDB;Integrated Security=True";
-            SqlConnection connection = new SqlConnection(connectionString);
-            connection.Open();
-            SqlCommand command = new SqlCommand();
-
             List<Class> classListCurrent = genericClassContent.findClassListByBig(medical.MedicalUrl, Tag);
             List<Class> classListDB = DBHelper.existingClassFromDB(medical.MedicalID);
-            List<Medical> medicalListDB = DBHelper.StaticMedicalTableList();
-
-            //Case 1 : Current Medical is completely new to database
-
-            bool have = false;
-            foreach (Medical item in medicalListDB)
-            {
-                //Console.WriteLine(medical.MedicalID + " : " + item.MedicalID);
-                if (medical.MedicalID == item.MedicalID)
-                {
-                    have = true;
-                    break;
-                }
-            }
-            //Console.WriteLine("Have value here : " + have);
-            if (have == false)
-            {
-                foreach (Class item in classListCurrent)
-                {
-                    string className = item.ClassName;
-                    string classDescription = item.ClassDescription;
-                    string classPrice = item.ClassPrice;
-
-                    try
-                    {
-                        string Query2 = "insert into Class(ClassName, ClassDescription, ClassPrice, MedicalID, ClassStatus) values('" + className + "', '" + classDescription + "', '" + classPrice + "', '" + medical.MedicalID + "', '" + true + "');";
-                        command = new SqlCommand(Query2, connection);
-                        command.ExecuteNonQuery();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Database Error : " + ex.Message);
-                    }
-                }
-                connection.Close();
-                return;
-            }
-
-            //Case 2 : Present in Database and current Extracted class information || Present in current extracted class information but not in database
-            foreach (Class itemCurrent in classListCurrent)
-            {
-                bool present = false;
-                int id = -1;
-                foreach (Class itemDB in classListDB)
-                {
-                    if (itemDB.ClassName == itemCurrent.ClassName)
-                    {
-                        id = itemDB.ClassID;
-                        present = true;
-                        break;
-                    }
-                }
-                //Console.WriteLine("Present 1  here : " + present + " : " + id);
-                if (present == true)
-                {
-                    try
-                    {
-                        String Query = "UPDATE Class set ClassName = '" + itemCurrent.ClassName + "', ClassDescription = '" + itemCurrent.ClassDescription + "', ClassPrice = '" + itemCurrent.ClassPrice + "', DateAndTime = CURRENT_TIMESTAMP, ClassStatus = '"+true+"' where ID = '" + id + "';";
-                        //Console.WriteLine("Big Query : " + Query);
-                        command = new SqlCommand(Query, connection);
-                        command.ExecuteNonQuery();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Error Message : " + ex.Message);
-                    }
-                }
-                else
-                {
-                    try
-                    {
-                        string Query = "insert into Class(ClassName, ClassDescription, ClassPrice, MedicalID, ClassStatus) values('" + itemCurrent.ClassName + "', '" + itemCurrent.ClassDescription + "', '" + itemCurrent.ClassPrice + "', '" + medical.MedicalID + "', '" + true + "');";
-                        command = new SqlCommand(Query, connection);
-                        command.ExecuteNonQuery();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Error Message : " + ex.Message);
-                    }
-                }
-            }
-
-            //Case 3 : Present in Database but not present in Current class information
-            foreach (Class itemDB in classListDB)
-            {
-                bool isPresent = true;
-                foreach (Class itemCurrent in classListCurrent)
-                {
-                    if (itemDB.ClassName == itemCurrent.ClassName)
-                    {
-                        isPresent = false;
-                        break;
-                    }
-                }
-                //Console.WriteLine("Present 2 here : " + isPresent);
-                if (isPresent == true)
-                {
-                    try
-                    {
-                        string Query = "update Class set ClassStatus = '" + false + "' where ID = '" + itemDB.ClassID + "'";
-                        Console.WriteLine(Query);
-                        command = new SqlCommand(Query, connection);
-                        command.ExecuteNonQuery();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Error Message : " + ex.Message);
-                    }
-                }
-            }
+            DBHelper.executeDatabaseQuery(medical, classListCurrent, classListDB); //Will execute all of the required query for this current Big tag
         }
         public static List<Class> existingClassFromDB(int medicalID)
         {
@@ -1186,6 +1303,11 @@ namespace WebClient_ConsoleApp
                     Tuple<char, char, char, char, char, char> Tag = new Tuple<char, char, char, char, char, char>('<', 'h', '6', 'h', '6', '>');
                     dBHelper.updateClassTableForHeading(executeCurrentMedical, Tag);
                 }
+                else if(tag == "p")
+                {
+                    Tuple<char, char, char, char, char, char> Tag = new Tuple<char, char, char, char, char, char>('<', 'p', '>', '/', 'p', '>');
+                    dBHelper.updateClassTableForParagraph(executeCurrentMedical, Tag);
+                }
                 else if(tag == "big")
                 {
                     string Tag = "<BIG></BIG>";
@@ -1199,16 +1321,21 @@ namespace WebClient_ConsoleApp
     {
         static void Main(string[] args)
         {
-            //string address = "https://gracefull.com/online-classes/"; //h2 tag
+            // string address = "https://gracefull.com/online-classes/"; //h2 tag
             //string address = "https://www.sutterhealth.org/classes-events-search?keywords=eclass&remove-default-affiliate-filter=true&attachQS=true"; //h2 tag
             //string address = "https://casa-natal.com/classes-groups/"; //h1 tag
             //string address = "https://www.scripps.org/events";  //h4 tag
+            //string address = "https://southcoastmidwifery.com/childbirth-education/"; //p tag
+            //string address = "https://psjhcrmwebsites.microsoftcrmportals.com/home?Region=CAOC&Ministry=%7B585D078B-8967-4D24-BCF0-FF2C9D4A52F2%7D"; //h1 tag
+            string address = "https://dominicanhospital.digitalsignup.com/Class/137-balance-bones-and-strength";
+            //GenericClassContent.findHTML(address);
 
             SearchContentUI searchContentUI = new SearchContentUI();
-            //searchContentUI.inputOutput();
+            searchContentUI.inputOutput();
 
             DatabaseUI databaseUI = new DatabaseUI();
-            databaseUI.ClassTable();
+            //databaseUI.ClassTable();
+
         }
     }
 }
