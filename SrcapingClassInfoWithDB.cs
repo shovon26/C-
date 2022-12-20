@@ -66,7 +66,8 @@ namespace WebClient_ConsoleApp
                 if (content[i] == '>')
                 {
                     int idx = i + 1;
-                    if (content[idx] == '<')
+                    if (idx >= len) break;
+                    if (idx < len && content[idx] == '<')
                     {
                         i++;
                         continue;
@@ -90,13 +91,26 @@ namespace WebClient_ConsoleApp
                 else i++;
             }
 
+            if (from == -1) return "";
+
             string ret = "";
             for (int i = from; i < len; i++)
             {
                 if (content[i] == '<') break;
                 ret += content[i];
             }
-            return ret;
+            string answer = "";
+            int noSpace = -1;
+            for (int i = 0; i < ret.Length; i++)
+            {
+                if ((ret[i] >= 'a' && ret[i] <= 'z') || (ret[i] >= 'A' && ret[i] <= 'Z') || (ret[i] >= '0' && ret[i] <= '9'))
+                {
+                    noSpace = i;
+                    break;
+                }
+            }
+            for (int i = noSpace; i < ret.Length; i++) answer += ret[i];
+            return answer;
         }
 
         private static string removeDescriptionTag(string content)  //remove description tag and return only raw description
@@ -130,7 +144,7 @@ namespace WebClient_ConsoleApp
             string ret = "";
             for(int i=0; i<result.Length; i++)
             {
-                if((result[i] >= 'a' && result[i] <= 'z') || (result[i] >= 'A' && result[i] <= 'Z') ||
+                if((result[i] >= 'a' && result[i] <= 'z') || (result[i] >= 'A' && result[i] <= 'Z') || (result[i] >= '0' && result[i] <= '9') ||
                     result[i] == ' ' || result[i] == '.' || result[i] == ',' || result[i] == '$' || result[i] == ':'
                     || result[i] == ';' || result[i] == '(' || result[i] == ')')
                 {
@@ -142,7 +156,11 @@ namespace WebClient_ConsoleApp
             int idx = 0;
             int N = ret.Length;
             string answer = "";
-            while (ret[idx] == ' ') idx++;
+            while (idx < N)
+            {
+                if (ret[idx] != ' ') break;
+                idx++;
+            }
             while(idx < N)
             {
                 if (idx < N && ret[idx] == ' ')
@@ -242,7 +260,6 @@ namespace WebClient_ConsoleApp
         public List<Class> findClassListByBig(string address, string tag)
         {
             WebClient client = new WebClient();
-            //client.Headers["Content-Type"] = "text/html";
             client.Headers["user-agent"] = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Mobile Safari/537.36";
 
             string reply = client.DownloadString(address);
@@ -266,6 +283,14 @@ namespace WebClient_ConsoleApp
                         idx++;
                     }
 
+                    bool containImageOrQuestionMark = GenericClassContent.checkClass(temp);
+                    string tempClassContent = GenericClassContent.findContent(temp);
+                    if (tempClassContent == "" || temp.Substring(4, 5) == "Class" || temp.Substring(4, 7) == "Classes" || containImageOrQuestionMark == false)
+                    {
+                        i++;
+                        continue;
+                    }
+
                     string classPrice = "";
 
                     // Finding class Price
@@ -273,7 +298,6 @@ namespace WebClient_ConsoleApp
                     {
                         int next_idx = idx+7;
                         bool have = false;
-                        //string price = "";
                         while (next_idx < len)
                         {
                             if (i + 5 < len && reply.Substring(next_idx, 5) == tag.Substring(0, 5))
@@ -297,7 +321,6 @@ namespace WebClient_ConsoleApp
                                     current_price += reply[price_index];
                                     price_index++;
                                 }
-                                //Console.WriteLine("Current Price : " + current_price);
 
                                 int P = GenericClassContent.convertPrice(current_price);
                                 if (P >= 10 && P <= 500)
@@ -313,7 +336,6 @@ namespace WebClient_ConsoleApp
                             }
                             else if (next_idx + 3 < len && reply[next_idx] == '&' && reply[next_idx + 1] == '#' && reply[next_idx + 2] == '3' && reply[next_idx + 3] == '6')
                             {
-                                //Console.WriteLine("Block 2");
                                 int from = next_idx + 4;
                                 while (true)
                                 {
@@ -380,7 +402,7 @@ namespace WebClient_ConsoleApp
                             add += reply[from + 2];
                             for (int rep = from + 3; rep < len; rep++)
                             {
-                                if (rep + 2 < len && reply[rep] == '<' && reply[rep + 1] == 'H' && reply[rep + 2] == 'R')
+                                if (rep + 2 < len && reply[rep] == '<' && reply[rep + 1] == 'H' && reply[rep + 2] == 'R') // <hr> tag is automatically converted to upper case <HR>
                                 {
                                     add += reply[rep];
                                     add += reply[rep + 1];
@@ -389,12 +411,12 @@ namespace WebClient_ConsoleApp
                                 }
                                 add += reply[rep];
                             }
-                            //Console.WriteLine("Add string : " + add);
                             Class classNow = new Class(temp, add, classPrice);
                             classes.Add(classNow);
                             break;
                         }
 
+                        int saveIndex = nextClassIndex;
                         int to = -1;
                         while (nextClassIndex > from)
                         {
@@ -405,7 +427,8 @@ namespace WebClient_ConsoleApp
                             }
                             nextClassIndex--;
                         }
-                        if (to == -1) to = len - 1;
+
+                        if (to == -1) to = nextClassIndex;
                         string delta = "";
                         for (int rep = from; rep <= to; rep++) delta += reply[rep];
                         Class currentClass = new Class(temp, delta, classPrice);
@@ -442,8 +465,6 @@ namespace WebClient_ConsoleApp
             client.Headers["user-agent"] = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Mobile Safari/537.36";
             string reply = client.DownloadString(address);
             int len = reply.Length;
-            //Console.WriteLine("Total Length : " + len);
-            //Console.WriteLine("html full : " + reply);
             List<Class> classes = new List<Class>();
             for (int i = 0; i + 2 < len;)
             {
@@ -454,6 +475,7 @@ namespace WebClient_ConsoleApp
                     temp += reply[i];
                     temp += reply[i + 1];
                     temp += reply[i + 2];
+                  
                     while (idx + 2 < len)
                     {
                         if (idx+2 < len && reply[idx] == tag.Item4 && reply[idx + 1] == tag.Item5 && reply[idx + 2] == tag.Item6)
@@ -466,11 +488,9 @@ namespace WebClient_ConsoleApp
                         temp += reply[idx];
                         idx++;
                     }
-                    bool containImage = GenericClassContent.checkClass(temp);
-
-                    //Console.WriteLine("Class Name : " + temp);
-
-                    if (temp.Substring(4, 5) == "Class" || temp.Substring(4, 7) == "Classes" || containImage == false)
+                    bool containImageOrQuestionMark = GenericClassContent.checkClass(temp);
+                    string tempClassContent = GenericClassContent.findContent(temp);
+                    if (tempClassContent == "" || temp.Substring(4, 5) == "Class" || temp.Substring(4, 7) == "Classes" || temp.Substring(4, 3) == "Tag" || containImageOrQuestionMark == false)
                     {
                         i++;
                         continue;
@@ -484,7 +504,6 @@ namespace WebClient_ConsoleApp
                     {
                         int next_idx = idx;
                         bool have = false;
-                        //string price = "";
                         while (next_idx < len)
                         {
                             if (reply[next_idx] == tag.Item1 && reply[next_idx + 1] == tag.Item2 && reply[next_idx + 2] == tag.Item3)
@@ -493,7 +512,6 @@ namespace WebClient_ConsoleApp
                             }
                             if (reply[next_idx] == '$')
                             {
-                                //Console.WriteLine("Block 1");
                                 int from = next_idx + 1;
                                 have = true;
                                 while (true)
@@ -509,7 +527,6 @@ namespace WebClient_ConsoleApp
                                     current_price += reply[price_index];
                                     price_index++;
                                 }
-                                //Console.WriteLine("Current Price : " + current_price);
 
                                 int P = GenericClassContent.convertPrice(current_price);
                                 if (P >= 10 && P <= 500)
@@ -525,7 +542,6 @@ namespace WebClient_ConsoleApp
                             }
                             else if (next_idx + 3 < len && reply[next_idx] == '&' && reply[next_idx + 1] == '#' && reply[next_idx + 2] == '3' && reply[next_idx + 3] == '6')
                             {
-                                //Console.WriteLine("Block 2");
                                 int from = next_idx + 4;
                                 while (true)
                                 {
@@ -563,25 +579,11 @@ namespace WebClient_ConsoleApp
                         Console.WriteLine("Error1 : " + ex.Message);
                     }
 
+
                     // Finding class Description
                     try
                     {
-                        //find starting paragraph
-                        int next_idx = idx;
-                        int from = -1;
-                        while (next_idx < len)
-                        {
-                            if (next_idx + 1 < len && reply[next_idx] == '<' && reply[next_idx + 1] == 'p')
-                            {
-                                from = next_idx;
-                                break;
-                            }
-                            next_idx++;
-                        }
-
-                        if (from == -1) from = idx + 3;
-
-                        // find Ending paragraph
+                        int from = idx + 3;
                         int nextClassIndex = from + 1;
                         bool ok1 = false;
                         while (nextClassIndex < len)
@@ -601,6 +603,7 @@ namespace WebClient_ConsoleApp
                             add += reply[from + 2];
                             for (int rep = from + 3; rep < len; rep++)
                             {
+                                if (rep + 7 < len && reply.Substring(rep, 7) == "/footer") break;
                                 if (rep + 2 < len && reply[rep] == '/' && reply[rep + 1] == 'p' && reply[rep + 2] == '>')
                                 {
                                     add += reply[rep];
@@ -614,17 +617,18 @@ namespace WebClient_ConsoleApp
                             classes.Add(tempClass);
                             break;
                         }
-
+                        int saveIndex = nextClassIndex;
                         int to = -1;
                         while (nextClassIndex > from)
                         {
-                            if (reply[nextClassIndex] == '>' && reply[nextClassIndex - 1] == 'p' && reply[nextClassIndex - 2] == '/')
+                            if (nextClassIndex - 2 >= 0 && reply[nextClassIndex] == '>' && reply[nextClassIndex - 1] == 'p' && reply[nextClassIndex - 2] == '/')
                             {
                                 to = nextClassIndex;
                                 break;
                             }
                             nextClassIndex--;
                         }
+                        if (to == -1) to = saveIndex;
                         string delta = "";
                         for (int rep = from; rep <= to; rep++) delta += reply[rep];
                         Class currentClass = new Class(temp, delta, classPrice);
@@ -640,6 +644,8 @@ namespace WebClient_ConsoleApp
                 }
                 else i++;
             }
+
+            
 
             List<Class> classList = new List<Class>();
 
@@ -679,7 +685,6 @@ namespace WebClient_ConsoleApp
                 if (i + 2 < len && reply[i] == tag.Item1 && reply[i + 1] == tag.Item2 && reply[i + 2] == tag.Item3) // find possible class 
                 {
                     int idx = i + 3;
-                    //Console.WriteLine("Test 1 : " + reply.Substring(idx, 10));
                     bool possibleClass = false;
                     while (idx < len)
                     {
@@ -736,7 +741,6 @@ namespace WebClient_ConsoleApp
                                 }
                                 if (reply[next_idx] == '$')
                                 {
-                                    //Console.WriteLine("Block 1");
                                     int from = next_idx + 1;
                                     have = true;
                                     while (true)
@@ -767,7 +771,6 @@ namespace WebClient_ConsoleApp
                                 }
                                 else if (next_idx + 3 < len && reply[next_idx] == '&' && reply[next_idx + 1] == '#' && reply[next_idx + 2] == '3' && reply[next_idx + 3] == '6')
                                 {
-                                    //Console.WriteLine("Block 2");
                                     int from = next_idx + 4;
                                     while (true)
                                     {
@@ -815,15 +818,12 @@ namespace WebClient_ConsoleApp
 
                             string description = "";
 
-                            //Console.WriteLine("Test : " + reply.Substring(from, 20));
-
                             while(from < len)
                             {
                                 if (from+3 < len && reply[from] == '<' && reply[from + 1] == tag.Item4 && reply[from + 2] == tag.Item5 && reply[from + 3] == tag.Item6) break;
                                 description+= reply[from];
                                 from++;
                             }
-                           // Console.WriteLine("Class Price : " + classPrice + "\n\n");
                             
                             Class currentClass = new Class(temp, description, classPrice);
                             classes.Add(currentClass);
@@ -849,13 +849,11 @@ namespace WebClient_ConsoleApp
                 string classDescription = GenericClassContent.removeDescriptionTag(con2);
                 string classPrice = item.ClassPrice;
                 Class currentClass = new Class(className, classDescription, classPrice);
-                //Console.WriteLine(currentClass.ClassName + "\n" + currentClass.ClassDescription+ "\n" + currentClass.ClassPrice);
                 classList.Add(currentClass);
             }
             return classList;
         }
     }
-
 
     public class SearchContent
     {
@@ -933,9 +931,20 @@ namespace WebClient_ConsoleApp
             }
             Console.WriteLine("\n\n");
         }
+
+        public void forParagraphTag(string address)
+        {
+            Tuple<char, char, char, char, char, char> Tag = new Tuple<char, char, char, char, char, char>('<', 'p', '>', '/', 'p', '>');
+            List<Class> classList = genericClassContent.findClassListByParagraph(address, Tag);
+            foreach (Class item in classList)
+            {
+                Console.WriteLine("\n\n" + item.ClassName + ", \n\n " + item.ClassDescription + " \n\n" + item.ClassPrice);
+            }
+            Console.WriteLine("\n\n");
+        }
     }
 
-    public class SearchContentUI
+    public class SearchContentUI 
     {
         SearchContent searchContent = new SearchContent();
         public void inputOutput()
@@ -953,7 +962,7 @@ namespace WebClient_ConsoleApp
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error here : " + ex.Message);
+                    Console.WriteLine("Error : " + ex.Message);
                 }
             }
             else if (tag == "h2")
@@ -1022,6 +1031,17 @@ namespace WebClient_ConsoleApp
                     Console.WriteLine("Error : " + ex.Message);
                 }
             }
+            else if(tag == "p")
+            {
+                try
+                {
+                    searchContent.forParagraphTag(address);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error : " + ex.Message);
+                }
+            }
             else
             {
                 Console.WriteLine("Provide Proper tag");
@@ -1046,14 +1066,12 @@ namespace WebClient_ConsoleApp
             bool have = false;
             foreach (Medical item in medicalListDB)
             {
-                // Console.WriteLine(medical.MedicalID + " : " + item.MedicalID);
                 if (medical.MedicalID == item.MedicalID)
                 {
                     have = true;
                     break;
                 }
             }
-            //Console.WriteLine("Have value here : " + have);
             if (have == false)
             {
                 foreach (Class item in classListCurrent)
@@ -1091,13 +1109,11 @@ namespace WebClient_ConsoleApp
                         break;
                     }
                 }
-                //Console.WriteLine("Present 1  here : " + present);
                 if (present == true)
                 {
                     try
                     {
                         String Query = "UPDATE Class set ClassName = '" + itemCurrent.ClassName + "', ClassDescription = '" + itemCurrent.ClassDescription + "', ClassPrice = '" + itemCurrent.ClassPrice + "', DateAndTime = CURRENT_TIMESTAMP, ClassStatus = '" + true + "' where ID = '" + id + "';";
-                        //Console.WriteLine("Medical ID : " + medical.MedicalID + "\n\n Query : " + Query);
                         command = new SqlCommand(Query, connection);
                         command.ExecuteNonQuery();
                     }
@@ -1133,13 +1149,11 @@ namespace WebClient_ConsoleApp
                         break;
                     }
                 }
-                //Console.WriteLine("Present 2  here : " + isPresent);
                 if (isPresent == true)
                 {
                     try
                     {
                         string Query = "update Class set ClassStatus = '" + false + "' where ID = '" + itemDB.ClassID + "'";
-                        //Console.WriteLine("2nd Query : " + Query);
                         command = new SqlCommand(Query, connection);
                         command.ExecuteNonQuery();
                     }
@@ -1266,7 +1280,6 @@ namespace WebClient_ConsoleApp
         public void ClassTable()
         {  
             List<Medical> medicalList = dBHelper.MedicalTableList();
-            //Console.WriteLine("Total Medical : " + medicalList.Count);
             foreach(Medical medical in medicalList)
             {
                 int medicalID = medical.MedicalID;
@@ -1321,13 +1334,13 @@ namespace WebClient_ConsoleApp
     {
         static void Main(string[] args)
         {
-            // string address = "https://gracefull.com/online-classes/"; //h2 tag
+            //string address = "https://gracefull.com/online-classes/"; //h2 tag
             //string address = "https://www.sutterhealth.org/classes-events-search?keywords=eclass&remove-default-affiliate-filter=true&attachQS=true"; //h2 tag
             //string address = "https://casa-natal.com/classes-groups/"; //h1 tag
             //string address = "https://www.scripps.org/events";  //h4 tag
             //string address = "https://southcoastmidwifery.com/childbirth-education/"; //p tag
             //string address = "https://psjhcrmwebsites.microsoftcrmportals.com/home?Region=CAOC&Ministry=%7B585D078B-8967-4D24-BCF0-FF2C9D4A52F2%7D"; //h1 tag
-            string address = "https://dominicanhospital.digitalsignup.com/Class/137-balance-bones-and-strength";
+            string address = "https://classes.inquicker.com/search/?ClientID=3157";
             //GenericClassContent.findHTML(address);
 
             SearchContentUI searchContentUI = new SearchContentUI();
@@ -1335,7 +1348,6 @@ namespace WebClient_ConsoleApp
 
             DatabaseUI databaseUI = new DatabaseUI();
             //databaseUI.ClassTable();
-
         }
     }
 }
